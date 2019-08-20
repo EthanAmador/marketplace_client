@@ -1,0 +1,15 @@
+.Principal_logo{
+    width: 70px; 
+    height: 70px;
+}
+
+.FileNotFound_logo{
+    width: 50%; 
+    height: 50%;
+}
+
+.Form_Create{
+    max-width: 40% !important;
+    min-width: 20% !important; 
+    padding: 20px;
+}
