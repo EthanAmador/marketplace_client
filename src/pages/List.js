@@ -45,12 +45,12 @@ class List extends React.Component {
                 return (
                   <div key={d._id} className="col-md-4">
                     <div className="card mb-4 shadow-sm">
-                      <img src="..." className="card-img-top" alt="..." />
+                      <img src={d.image} className="card-img-top" alt="..." />
                       <div className="card-body">
                         <h5 className="card-title">{d.name}</h5>
                         <p className="card-text">{d.description} </p>
                         <Link
-                          to={`/detail/${d._id}`}
+                          to={`/create/${d._id}`}
                           className="btn btn-primary"
                         >
                           view

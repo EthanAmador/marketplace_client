@@ -1,136 +1,195 @@
-import React from "react"; 
+import React from "react";
 import { Combobox } from "react-widgets";
-import Api from "../repository/Api"; 
-import Loading from "../components/Loading"; 
+import Api from "../repository/Api";
+import Loading from "../components/Loading";
+import FileUpload from "../components/FileUpload";
 
-class ProductsCreate extends React.Component{
-    state={}; 
-    constructor(props){
-        super(props); 
-        this.state = {
-            category: {
-                data:undefined,
-                loading:false,
-                error:undefined
-            },
-            name:'',
-            description:'',
-            price:'',
-            categorySelect:{}
-          };
+class ProductsCreate extends React.Component {
+  state = {};
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: false,
+      error: undefined,
+      category: {
+        data: undefined
+      },
+      product: {
+        data: undefined
+      },
+      name: "",
+      description: "",
+      price: "",
+      cmbCategory: "",
+      file: ""
+    };
+  }
+
+  componentDidMount() {
+    this.fetchData();
+
+    const {
+      match: { params }
+    } = this.props;
+    if (params.id) {
+      this.getProduct(params.id);
+    } else {
     }
+  }
 
-    componentDidMount(){
-        this.fetchData();  
+  fetchData = async () => {
+    this.setState({ error: undefined, loading: true });
+    try {
+      const _data = await Api.category.getCategory();
+      this.setState({ category: { data: _data.data }, loading: false });
+    } catch (error) {
+      this.setState({ error: error, loading: false });
     }
+  };
 
-    fetchData = async () =>{
-        this.setState({ category:{error:undefined, loading:true}}); 
-        try {
-            const _data = await Api.category.getCategory();
-            this.setState({ category:{data:_data.data, loading:false}}); 
-        } catch (error) {
-            this.setState({ category:{error:error, loading:false}}); 
-        }
-    }   
-
-    handleOnChange = (e) =>{
-        this.setState({ 
-            [e.target.name]: e.target.value
-        } )
-    }
-
-    handleOnSelect=(value)=>{
-        this.setState({
-            "categorySelect": value
-        })
-    }
-
-    handleOnSubmit=(e)=>{
-        e.preventDefault(); 
-
-        let _product = {
-            name: this.state.name,
-            description: this.state.description,
-            price: this.state.price,
-            categoryId:this.state.categorySelect._id,
-            categoryName:this.state.categorySelect.name
-        }
-       
-        this.saveProduct(_product); 
-    }
-
-    saveProduct = async (product) =>{
-        try {
-          const _result = await Api.product.saveProduct(product)
-          this.constructor(null); 
-        } catch (error) {
-
-        }
-    }
-
-
-    render(){
+  getProduct = async id => {
+    this.setState({ error: undefined, loading: true });
+    try {
+      let _data = await Api.product.getProductById(id);
+      
+      _data = _data.data[0]; 
+      
+      this.setState({
+        name: _data.name,
+        description: _data.description,
+        price: _data.price,
+        cmbCategory: {
+          _id: _data.categoryId,
+          name:_data.categoryName
+        },
+        file: {
+          base64: _data.image
+        }, 
+        product:_data
         
-        if(this.state.category.loading === true){
-            return(
-                <div className="container Form_Create">
-                    <Loading />
-                </div>
-            ) 
-        }
-        return(
-            <div className="container Form_Create">
-                <form onSubmit={this.handleOnSubmit}>
-                    <div className="form-group">
-                        <label>Name</label>
-                        <input 
-                                type="text" 
-                                className="form-control" 
-                                name="name" 
-                                aria-describedby="emailHelp" 
-                                placeholder="Name"
-                                required
-                                onChange={this.handleOnChange}
-                                value={this.state.name}/>
-                    </div>
-                    <div className="form-group">
-                        <label>Description</label>
-                        <textarea 
-                                className="form-control" 
-                                name="description" 
-                                rows="3"
-                                onChange={this.handleOnChange}
-                                value={this.state.description}
-                                >
-                        </textarea>
-                    </div>
-                    <div className="form-group">
-                        <label >Price</label>
-                        <input 
-                                type="number" className="form-control" 
-                                name="price" 
-                                aria-describedby="emailHelp" 
-                                placeholder="Price"
-                                required
-                                onChange={this.handleOnChange}
-                                value={this.state.price}
-                                />
-                    </div>
-                    <div className="form-group">
-                        <label>Category</label>
-                        <Combobox
-                            data={this.state.category.data}
-                            textField="name"
-                            valueField="_id"
-                            onSelect={value => this.handleOnSelect(value)}
-                            placeholder="Category"/>
-                    </div>
-                    <button className="btn btn-outline-success float-right">Success</button>
-                </form>
-            </div>
-        ); 
+      });
+    } catch (error) {
+      this.setState({ error: error, loading: false });
     }
+  };
+
+  handleOnChange = e => {
+    this.setState({
+      [e.target.name]: e.target.value
+    });
+  };
+
+  handleOnSelect = value => {
+    this.setState({
+      cmbCategory: value
+    });
+  };
+
+  handleOnSubmit = e => {
+    e.preventDefault();
+
+    let _product = {
+      name: this.state.name,
+      description: this.state.description,
+      price: this.state.price,
+      categoryId: this.state.cmbCategory._id,
+      categoryName: this.state.cmbCategory.name,
+      image: this.state.file.base64
+    };
+    let _id = this.state.product._id;
+    this.saveProduct(_id,_product);
+  };
+
+  saveProduct = async (id,product) => {
+    try {
+      const _result = undefined
+      if(id){
+        _result = await Api.product.modifProduct(id,product); 
+      }else{
+        _result = await Api.product.saveProduct(product);
+      }
+      
+    } catch (error) {}
+  };
+
+  getFiles = file => {
+    this.setState({ file: file });
+  };
+
+  render() {
+    if (this.state.loading === true) {
+      return (
+        <div className="container Form_Create">
+          <Loading />
+        </div>
+      );
+    }
+    return (
+      <div className="container Form_Create">
+        <form onSubmit={this.handleOnSubmit}>
+          <div className="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              className="form-control"
+              name="name"
+              aria-describedby="emailHelp"
+              placeholder="Name"
+              required
+              onChange={this.handleOnChange}
+              value={this.state.name}
+            />
+          </div>
+          <div className="form-group">
+            <label>Description</label>
+            <textarea
+              className="form-control"
+              name="description"
+              rows="3"
+              onChange={this.handleOnChange}
+              value={this.state.description}
+            />
+          </div>
+          <div className="form-group">
+            <label>Price</label>
+            <input
+              type="number"
+              className="form-control"
+              name="price"
+              aria-describedby="emailHelp"
+              placeholder="Price"
+              required
+              onChange={this.handleOnChange}
+              value={this.state.price}
+            />
+          </div>
+          <div className="form-group">
+            <label>Category</label>
+            <Combobox
+              data={this.state.category.data}
+              textField="name"
+              valueField="_id"
+              onSelect={value => this.handleOnSelect(value)}
+              onChange={value => this.handleOnSelect(value)}
+              placeholder="Category"
+              name="cmbCategory"
+              value={this.state.cmbCategory}
+            />
+          </div>
+          <div className="form-group">
+            <label>Image</label>
+            <FileUpload
+              onDone={this.getFiles.bind(this)}
+              name="file"
+              value={this.state.file}
+              onChange={this.getFiles.bind(this)}
+            />
+          </div>
+          <button className="btn btn-outline-success float-right">Save</button>
+        </form>
+      </div>
+    );
+  }
 }
 
-export default ProductsCreate; 
+export default ProductsCreate;

@@ -13,8 +13,8 @@ function App() {
       <Layout>
         <Switch>
           <Route path="/" exact component={Principal} />
-          <Route path="/create" exact component={ProductsCreate} />
-          <Route path="/detail/:id" exact component={ProductDetail} />
+          <Route path="/create/:id?" exact component={ProductsCreate} />
+          {/* <Route path="/detail/:id" exact component={ProductDetail} /> */}
           <Route component={NotFound} />
         </Switch>
       </Layout>

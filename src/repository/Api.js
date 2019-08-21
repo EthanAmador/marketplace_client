@@ -26,9 +26,18 @@ const Api = {
       getProducts(pageIndex,pageSize,name){
           return callApi(`/products/${pageIndex}/${pageSize}`)
       },
+      getProductById(id){
+        return callApi(`/products/${id}`); 
+      },
       saveProduct(product){
         return callApi("/products",{
           method: 'POST',
+          body: JSON.stringify(product),
+        })
+      },
+      modifProduct(id,product){
+        return callApi(`/products/${id}`,{
+          method: 'PUT',
           body: JSON.stringify(product),
         })
       }
