@@ -2,31 +2,12 @@ import React from "react";
 import { Combobox } from "react-widgets";
 
 class Filters extends React.Component {
-  state = {
-    category: [
-      {
-        id: "5d586cfe7db186777c5e66ca",
-        name: "Uno"
-      },
-      {
-        id: "5d586cfe7db186777c5e66ca",
-        name: "Dos"
-      },
-      {
-        id: "5d586cfe7db186777c5e66ca",
-        name: "Tres"
-      }
-    ]
-  };
-
-  handleOnSelect = e => {
-    console.log(e);
-  };
 
   handleOnClick = e => {
     e.preventDefault();
-    console.log("CLickMe");
   };
+
+
 
   render() {
     return (
@@ -39,16 +20,20 @@ class Filters extends React.Component {
                 type="search"
                 placeholder="Search"
                 aria-label="Search"
-                name="Search....."
+                name="search"
+                value={this.props.formValues.search}
+                onChange={this.props.onChange}
               />
             </div>
             <div className="col">
               <Combobox
-                data={this.state.category}
+                data={this.props.dataCategory}
                 textField="name"
-                valueField="id"
-                onSelect={value => this.handleOnSelect(value)}
+                valueField="_id"
                 placeholder="Category"
+                onChange={this.props.onChange}
+                value={this.props.formValues.category}
+                name="category"
               />
             </div>
             <div className="col">

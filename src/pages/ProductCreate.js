@@ -17,11 +17,13 @@ class ProductsCreate extends React.Component {
       product: {
         data: undefined
       },
-      name: "",
-      description: "",
-      price: "",
-      cmbCategory: "",
-      file: ""
+      form:{
+        name: "",
+        description: "",
+        price: "",
+        cmbCategory: "",
+        file: ""
+      }
     };
   }
 
@@ -55,18 +57,19 @@ class ProductsCreate extends React.Component {
       _data = _data.data[0]; 
       
       this.setState({
-        name: _data.name,
-        description: _data.description,
-        price: _data.price,
-        cmbCategory: {
-          _id: _data.categoryId,
-          name:_data.categoryName
+        form:{
+          name: _data.name,
+          description: _data.description,
+          price: _data.price,
+          cmbCategory:{
+            _id: _data.categoryId,
+            name:_data.categoryName
+          },
+          file:{
+            base64: _data.image
+          }
         },
-        file: {
-          base64: _data.image
-        }, 
         product:_data
-        
       });
     } catch (error) {
       this.setState({ error: error, loading: false });
@@ -74,14 +77,22 @@ class ProductsCreate extends React.Component {
   };
 
   handleOnChange = e => {
+    
     this.setState({
-      [e.target.name]: e.target.value
+      form:{
+        ... this.state.form, 
+        [e.target.name]: e.target.value
+      }
     });
   };
 
   handleOnSelect = value => {
     this.setState({
-      cmbCategory: value
+      form:{
+        ... this.state.form, 
+        cmbCategory: value
+      }
+      
     });
   };
 
@@ -89,12 +100,12 @@ class ProductsCreate extends React.Component {
     e.preventDefault();
 
     let _product = {
-      name: this.state.name,
-      description: this.state.description,
-      price: this.state.price,
-      categoryId: this.state.cmbCategory._id,
-      categoryName: this.state.cmbCategory.name,
-      image: this.state.file.base64
+      name: this.state.form.name,
+      description: this.state.form.description,
+      price: this.state.form.price,
+      //categoryId: this.state.form.cmbCategory._id,
+      categoryName: this.state.form.cmbCategory.name,
+      image: this.state.form.file.base64
     };
     let _id = this.state.product._id;
     this.saveProduct(_id,_product);
@@ -109,11 +120,18 @@ class ProductsCreate extends React.Component {
         _result = await Api.product.saveProduct(product);
       }
       
-    } catch (error) {}
+    } catch (error) {
+      console.log(error); 
+    }
   };
 
   getFiles = file => {
-    this.setState({ file: file });
+    this.setState({ 
+      form:{
+        ... this.state.form, 
+          file: file
+      }
+       });
   };
 
   render() {
@@ -137,7 +155,7 @@ class ProductsCreate extends React.Component {
               placeholder="Name"
               required
               onChange={this.handleOnChange}
-              value={this.state.name}
+              value={this.state.form.name}
             />
           </div>
           <div className="form-group">
@@ -147,7 +165,7 @@ class ProductsCreate extends React.Component {
               name="description"
               rows="3"
               onChange={this.handleOnChange}
-              value={this.state.description}
+              value={this.state.form.description}
             />
           </div>
           <div className="form-group">
@@ -160,7 +178,7 @@ class ProductsCreate extends React.Component {
               placeholder="Price"
               required
               onChange={this.handleOnChange}
-              value={this.state.price}
+              value={this.state.form.price}
             />
           </div>
           <div className="form-group">
@@ -173,7 +191,7 @@ class ProductsCreate extends React.Component {
               onChange={value => this.handleOnSelect(value)}
               placeholder="Category"
               name="cmbCategory"
-              value={this.state.cmbCategory}
+              value={this.state.form.cmbCategory}
             />
           </div>
           <div className="form-group">
@@ -181,7 +199,7 @@ class ProductsCreate extends React.Component {
             <FileUpload
               onDone={this.getFiles.bind(this)}
               name="file"
-              value={this.state.file}
+              value={this.state.form.file}
               onChange={this.getFiles.bind(this)}
             />
           </div>
