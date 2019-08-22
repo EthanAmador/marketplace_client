@@ -3,23 +3,21 @@ import { Link } from "react-router-dom";
 import Loading from "../components/Loading";
 import Api from "../repository/Api";
 import { Combobox } from "react-widgets";
+import iconBuy from "../images/buy.svg";
 
 class List extends React.Component {
-
-
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
       error: false,
       data: undefined,
-      loadMoreData:false,
       pageIndex: 1,
       pageSize: 12,
       dataCategories: undefined,
       filterValues: {
-        category: '',
-        search: ''
+        category: "",
+        search: ""
       }
     };
   }
@@ -29,7 +27,6 @@ class List extends React.Component {
   }
 
   fetchData = async () => {
-
     this.setState({ loading: true, error: null });
     try {
       await this.getdataProducts();
@@ -38,24 +35,25 @@ class List extends React.Component {
     } catch (error) {
       this.setState({ loading: false, error: error });
     }
-  }
+  };
 
   handleChange = e => {
     this.setState({
       filterValues: {
-        ... this.state.filterValues, [e.target.name]: e.target.value,
-      },
+        ...this.state.filterValues,
+        [e.target.name]: e.target.value
+      }
     });
   };
 
   handleSelect = e => {
     this.setState({
       filterValues: {
-        ... this.state.filterValues,
+        ...this.state.filterValues,
         category: e
-      },
+      }
     });
-  }
+  };
 
   handleOnSubmit = async e => {
     e.preventDefault();
@@ -63,43 +61,44 @@ class List extends React.Component {
   };
 
   getdataProducts = async () => {
+    this.setState({ pageIndex: this.state.pageIndex + 1 });
 
-    if(this.state.loadMoreData){
-      let pageIndex = this.state.pageIndex +1
-      this.setState({pageIndex:pageIndex, loadMoreData:false})
+    console.log(this.state.pageIndex + 1);
 
-    }
     this.setState({ loading: true, error: null });
     try {
-      const data = await Api.product.getProducts(this.state.pageIndex,
+      const data = await Api.product.getProducts(
+        this.state.pageIndex,
         this.state.pageSize,
         this.state.filterValues.search,
-        this.state.filterValues.category._id);
+        this.state.filterValues.category._id
+      );
 
-        let result =undefined; 
-        if(this.state.data)
-        result = [].concat(this.state.data,data.data); 
-        else
-          result = data.data
+      let result = undefined;
+      if (this.state.data) result = [].concat(this.state.data, data.data);
+      else result = data.data;
 
-      this.setState({ 
-        loading: false, 
+      this.setState({
+        loading: false,
         data: result
       });
     } catch (error) {
       this.setState({ loading: false, error: error });
     }
-  }
+  };
 
   render() {
     if (this.state.loading === true) {
-      return <Loading />
+      return <Loading />;
     }
     return (
       <div>
         <div className="album py-5 bg-light">
           <div className="row justify-content-md-center Form_Search">
-            <form className="form-inline my-2 my-lg-0" onSubmit={this.handleOnSubmit}>
+            <form
+              className="form-inline my-2 my-lg-0"
+              onSubmit={this.handleOnSubmit}
+            >
               <div className="col">
                 <input
                   className="form-control mr-sm-2"
@@ -129,7 +128,7 @@ class List extends React.Component {
                   onClick={this.handleOnClick}
                 >
                   Search
-              </button>
+                </button>
               </div>
             </form>
           </div>
@@ -140,16 +139,32 @@ class List extends React.Component {
                 return (
                   <div key={d._id} className="col-md-4">
                     <div className="card mb-4 shadow-sm">
-                      <img src={d.image} className="card-img-top" alt="..." />
+                      <img src={d.image} className="card-img-top" />
                       <div className="card-body">
                         <h5 className="card-title">{d.name}</h5>
                         <p className="card-text">{d.description} </p>
-                        <Link
-                          to={`/create/${d._id}`}
-                          className="btn btn-primary"
-                        >
-                          view
-                        </Link>
+                        <div className="row">
+                          <div className="col">
+                            <Link
+                              to={`/create/${d._id}`}
+                              className="btn btn-primary"
+                            >
+                              view
+                            </Link>
+                          </div>
+                          <div className="col">
+                            <Link to="/" onClick={console.log("Click")}>
+                              <img className="iconBuy" src={iconBuy} />
+                            </Link>
+                          </div>
+                          <div className="col">
+                            <span>
+                              <u>
+                                <b>${d.price}</b>
+                              </u>
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -158,14 +173,15 @@ class List extends React.Component {
             </div>
           </div>
         </div>
-        <button 
-          type="button" 
+        <button
+          type="button"
           className="btn btn-lg btn-block btn-outline-primary"
-          onClick={ async() =>{
-            this.setState({loadMoreData:true}); 
+          onClick={async () => {
             await this.getdataProducts();
-          } }>
-          Load more products</button>
+          }}
+        >
+          Load more products
+        </button>
       </div>
     );
   }
