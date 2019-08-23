@@ -12,6 +12,7 @@ class List extends React.Component {
       loading: true,
       error: false,
       data: undefined,
+      loadMoreData: 1,
       pageIndex: 1,
       pageSize: 12,
       dataCategories: undefined,
@@ -24,6 +25,22 @@ class List extends React.Component {
 
   componentDidMount() {
     this.fetchData();
+  }
+
+  componentWillUnmount() {
+    this.state = {
+      loading: true,
+      error: false,
+      data: undefined,
+      pageIndex: 1,
+      loadMoreData: 1,
+      pageSize: 12,
+      dataCategories: undefined,
+      filterValues: {
+        category: "",
+        search: ""
+      }
+    };
   }
 
   fetchData = async () => {
@@ -61,9 +78,6 @@ class List extends React.Component {
   };
 
   getdataProducts = async () => {
-    this.setState({ pageIndex: this.state.pageIndex + 1 });
-
-    console.log(this.state.pageIndex + 1);
 
     this.setState({ loading: true, error: null });
     try {
@@ -74,7 +88,24 @@ class List extends React.Component {
         this.state.filterValues.category._id
       );
 
-      let result = undefined;
+      this.setState({
+        loading: false,
+        data: data.data
+      });
+    } catch (error) {
+      this.setState({ loading: false, error: error });
+    }
+  };
+
+  loadMoredataProducts = async () => {
+    this.setState({ loadMoreData: this.state.loadMoreData + 1, loading: true, error: null });
+    try {
+      const data = await Api.product.getProducts(
+        this.state.loadMoreData,
+        this.state.pageSize
+      );
+
+      let result
       if (this.state.data) result = [].concat(this.state.data, data.data);
       else result = data.data;
 
@@ -85,7 +116,8 @@ class List extends React.Component {
     } catch (error) {
       this.setState({ loading: false, error: error });
     }
-  };
+
+  }
 
   render() {
     if (this.state.loading === true) {
@@ -153,7 +185,7 @@ class List extends React.Component {
                             </Link>
                           </div>
                           <div className="col">
-                            <Link to="/" onClick={console.log("Click")}>
+                            <Link to={`/market/${d._id}`} >
                               <img className="iconBuy" src={iconBuy} />
                             </Link>
                           </div>
@@ -177,7 +209,7 @@ class List extends React.Component {
           type="button"
           className="btn btn-lg btn-block btn-outline-primary"
           onClick={async () => {
-            await this.getdataProducts();
+            await this.loadMoredataProducts();
           }}
         >
           Load more products

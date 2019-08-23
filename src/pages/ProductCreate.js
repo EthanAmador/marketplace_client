@@ -108,7 +108,7 @@ class ProductsCreate extends React.Component {
       image: this.state.form.file.base64
     };
     let _id = this.state.product._id;
-    this.saveProduct(_id,_product);
+    this.saveProduct(_id,_product).then(() => {this.props.history.push('/')});
   };
 
   saveProduct = async (id,product) => {

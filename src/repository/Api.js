@@ -46,7 +46,7 @@ const Api = {
       })
     },
     modifProduct(id, product) {
-      return callApi(`/ products / ${ id }`, {
+      return callApi(`/products/ ${ id }`, {
         method: 'PUT',
         body: JSON.stringify(product),
       })
@@ -58,34 +58,32 @@ const Api = {
     getCategory() {
       return callApi("/category");
     }
-  }
-  /*
-  badges: {
-    list() {
-      return callApi('/badges');
-    },
-    create(badge) {
-      return callApi(`/ badges`, {
+  },
+  shoppingCart:{
+    saveShopping(shopping) {
+      return callApi("/shopping", {
         method: 'POST',
-        body: JSON.stringify(badge),
-      });
+        body: JSON.stringify(shopping),
+      })
     },
-    read(badgeId) {
-      return callApi(`/ badges / ${ badgeId }`);
+    getShoping(pageIndex, pageSize, name, categoryId){
+      let _endPonit=`/shopping?pageindex=${pageIndex}&pagezise=${pageSize}`;
+
+      if(name)
+        _endPonit = _endPonit+`&name=${name}`; 
+    
+      if(categoryId)
+        _endPonit = _endPonit+`&categoryId=${categoryId}`; 
+        
+        return callApi(_endPonit);
     },
-    update(badgeId, updates) {
-      return callApi(`/ badges / ${ badgeId }`, {
-        method: 'PUT',
-        body: JSON.stringify(updates),
-      });
-    },
-    // Lo hubiera llamado `delete `, pero `delete ` es un keyword en JavaScript asi que no es buena idea :P
-    remove(badgeId) {
-      return callApi(`/ badges / ${ badgeId }`, {
+    deleteShopping(id){
+      return callApi(`/shopping/${id}`, {
         method: 'DELETE',
-      });
-    },
-  },*/
+      })
+    }
+  }
+ 
 };
 
 export default Api;
